@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schakelklas Corianne - Lichaamsdelen Spel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Zorg dat afbeeldingen mooi binnen het vak passen */
+        .body-part-image { 
+            max-width: 100%; 
+            max-height: 250px; 
+            object-fit: contain; 
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body class="bg-blue-50 font-sans min-h-screen flex flex-col items-center p-4">
+
+    <header class="text-center mb-8 w-full max-w-2xl border-b-2 border-blue-100 pb-4">
+        <h1 class="text-3xl font-bold text-blue-600">Schakelklas Corianne</h1>
+        <p class="text-gray-600">Samen leren we het lichaam kennen!</p>
+    </header>
+
+    <div id="login-section" class="bg-white p-8 rounded-xl shadow-xl w-full max-w-md border-t-4 border-green-400">
+        <h2 class="text-2xl font-semibold mb-5 text-gray-800 text-center">Hallo! Wie ben jij?</h2>
+        <input type="text" id="username" placeholder="Typ hier je voornaam..." class="w-full p-4 border-2 border-blue-100 rounded-lg mb-5 text-xl focus:border-blue-300 outline-none">
+        <button onclick="startMatchmaking()" class="w-full bg-green-500 text-white py-4 rounded-xl font-bold text-xl hover:bg-green-600 transition shadow-md">Spel Starten! 🚀</button>
+    </div>
+
+    <div id="waiting-screen" class="hidden text-center p-8 bg-white rounded-xl shadow-lg w-full max-w-md">
+        <div class="animate-bounce text-6xl mb-5">⏳</div>
+        <p class="text-2xl font-medium text-gray-700">Even geduld...</p>
+        <p class="text-gray-500 mt-2">We zoeken een maatje voor je in de klas.</p>
+    </div>
+
+    <div id="game-screen" class="hidden bg-white p-6 sm:p-8 rounded-3xl shadow-2xl w-full max-w-3xl text-center border-2 border-blue-100">
+        
+        <div class="flex justify-between items-center mb-6 border-b pb-4">
+            <div id="role-indicator" class="text-lg font-bold p-2 px-4 rounded-full bg-blue-100 text-blue-700"></div>
+            <div id="game-status" class="text-sm font-bold text-green-600 bg-green-50 p-2 px-4 rounded-full">Ronde 1</div>
+        </div>
+        
+        <div id="helper-view" class="hidden space-y-6">
+            <h3 class="text-xl font-semibold text-gray-800 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                🤫 <span class="text-yellow-800">Geheim!</span> Vertel niet wat het is!
+            </h3>
+            
+            <div id="image-container" class="flex justify-center p-4 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 min-h-[200px] items-center">
+                <img id="current-body-image" src="" alt="Lichaamsdeel" class="body-part-image">
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-xl border">
+                <p class="text-gray-600 mb-2">Heeft je maatje het goed getypt?</p>
+                <p id="typer-answer-display" class="text-3xl font-mono font-bold text-gray-400 mb-4 tracking-wider">[wacht op antwoord...]</p>
+                
+                <div class="flex justify-center gap-6">
+                    <button onclick="sendFeedback(true)" class="text-6xl hover:scale-110 transition bg-green-100 p-4 rounded-full shadow hover:bg-green-200">👍</button>
+                    <button onclick="sendFeedback(false)" class="text-6xl hover:scale-110 transition bg-red-100 p-4 rounded-full shadow hover:bg-red-200">👎</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="typer-view" class="hidden space-y-6">
+            <h3 class="text-xl font-semibold text-gray-800">Welk lichaamsdeel zie je op het scherm van je maatje?🔍</h3>
+            
+            <input type="text" id="word-input" class="w-full p-5 border-4 border-blue-200 rounded-2xl text-4xl text-center font-bold tracking-widest focus:border-blue-400 outline-none" placeholder="...">
+            
+            <button onclick="submitWord()" class="mt-4 bg-blue-500 text-white px-10 py-4 rounded-full font-bold text-xl shadow-lg hover:bg-blue-600 transition w-full sm:w-auto">Ik heb het getypt! ✅</button>
+            
+            <div id="typer-feedback-message" class="mt-6 text-2xl font-bold p-4 rounded-xl min-h-[60px]">
+                </div>
+        </div>
+    </div>
+
+    <div id="leaderboard" class="mt-12 w-full max-w-md bg-white p-6 rounded-xl shadow border border-gray-100">
+        <h3 class="text-center font-bold text-gray-700 mb-4 text-xl">🏆 Groeipunten van de klas</h3>
+        <div class="space-y-2" id="leaderboard-list">
+            </div>
+    </div>
+
+    <script type="module">
+        // Firebase setup (vereenvoudigd, gaat ervan uit dat je dit in een module script draait)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // JOUW DATABASE CONFIGURATIE
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxFVlEYMIewTN6bdSOTL3H8el1V3jm-DM",
+            authDomain: "schatgraversemoties.firebaseapp.com",
+            databaseURL: "https://schatgraversemoties-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "schatgraversemoties",
+            storageBucket: "schatgraversemoties.firebasestorage.app",
+            messagingSenderId: "180003857797",
+            appId: "1:180003857797:web:4890f9a02e1ac8c1f150ec"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // --- SPEL DATA EN CONFIGURATIE ---
+        // De volledige lijst met de nieuwe, fotorealistische afbeeldingen
+        const bodyParts = [
+            // Hoofd & Gezicht
+            { id: 1, naam: "haar", pad: "beelden/haar.png" },
+            { id: 2, naam: "kruin", pad: "beelden/kruin.png" },
+            { id: 3, naam: "voorhoofd", pad: "beelden/voorhoofd.png" },
+            { id: 4, naam: "wenkbrauw", pad: "beelden/wenkbrauw.png" },
+            { id: 5, naam: "wimper", pad: "beelden/wimper.png" },
+            { id: 6, naam: "oog", pad: "beelden/oog.png" },
+            { id: 7, naam: "neus", pad: "beelden/neus.png" },
+            { id: 8, naam: "mond", pad: "beelden/mond.png" },
+            { id: 9, naam: "kin", pad: "beelden/kin.png" },
+            
+            // Nek & Torso
+            { id: 10, naam: "nek", pad: "beelden/nek.png" },
+            { id: 11, naam: "hals", pad: "beelden/hals.png" },
+            { id: 12, naam: "schouder", pad: "beelden/schouder.png" },
+            { id: 13, naam: "rug", pad: "beelden/rug.png" },
+            { id: 14, naam: "buik", pad: "beelden/buik.png" },
+            { id: 15, naam: "navel", pad: "beelden/navel.png" },
+            { id: 16, naam: "heup", pad: "beelden/heup.png" },
+            { id: 17, naam: "bil", pad: "beelden/bil.png" },
+            
+            // Armen & Handen
+            { id: 18, naam: "arm", pad: "beelden/arm.png" },
+            
+            // Benen & Voeten
+            { id: 19, naam: "been", pad: "beelden/been.png" },
+            { id: 20, naam: "knie", pad: "beelden/knie.png" },
+            { id: 21, naam: "scheenbeen", pad: "beelden/scheenbeen.png" },
+            { id: 22, naam: "hiel", pad: "beelden/hiel.png" },
+            { id: 23, naam: "voet", pad: "beelden/voet.png" },
+            { id: 24, naam: "teen", pad: "beelden/teen.png" }
+        ];
+
+        // Lokale spel-staat
+        let state = {
+            currentUser: "",
+            userId: "",
+            myRole: "", // 'helper' of 'speurneus'
+            currentGameId: "game_demo_01",
+            currentPart: null
+        };
+
+        // --- UI ELEMENTEN ---
+        const UI = {
+            login: document.getElementById('login-section'),
+            waiting: document.getElementById('waiting-screen'),
+            game: document.getElementById('game-screen'),
+            helperView: document.getElementById('helper-view'),
+            typerView: document.getElementById('typer-view'),
+            roleInd: document.getElementById('role-indicator'),
+            image: document.getElementById('current-body-image'),
+            typerAnswer: document.getElementById('typer-answer-display'),
+            wordInput: document.getElementById('word-input'),
+            typerFeedback: document.getElementById('typer-feedback-message'),
+            leaderboard: document.getElementById('leaderboard-list')
+        };
+
+
+        // --- FUNCTIES ---
+
+        window.startMatchmaking = function() {
+            const name = document.getElementById('username').value.trim();
+            if(!name) return alert("Vul eerst je naam in!");
+            
+            state.currentUser = name;
+            state.userId = name.toLowerCase() + "_" + Math.floor(Math.random()*1000);
+
+            UI.login.classList.add('hidden');
+            UI.waiting.classList.remove('hidden');
+
+            setTimeout(() => {
+                UI.waiting.classList.add('hidden');
+                UI.game.classList.remove('hidden');
+                
+                state.myRole = Math.random() > 0.5 ? 'helper' : 'speurneus';
+                
+                setupRound();
+            }, 1500); 
+        };
+
+        function setupRound() {
+            state.currentPart = bodyParts[Math.floor(Math.random() * bodyParts.length)];
+
+            if(state.myRole === 'helper') {
+                UI.roleInd.innerText = `Jij bent de Helper 🌟 (${state.currentUser})`;
+                UI.roleInd.className = "text-lg font-bold p-2 px-4 rounded-full bg-yellow-100 text-yellow-700";
+                UI.helperView.classList.remove('hidden');
+                UI.typerView.classList.add('hidden');
+                
+                UI.image.src = state.currentPart.pad;
+                UI.typerAnswer.innerText = "[wacht op antwoord...]";
+                UI.typerAnswer.className = "text-3xl font-mono font-bold text-gray-400 mb-4 tracking-wider";
+
+            } else {
+                UI.roleInd.innerText = `Jij bent de Speurneus 🔍 (${state.currentUser})`;
+                UI.roleInd.className = "text-lg font-bold p-2 px-4 rounded-full bg-blue-100 text-blue-700";
+                UI.typerView.classList.remove('hidden');
+                UI.helperView.classList.add('hidden');
+                
+                UI.wordInput.value = "";
+                UI.typerFeedback.innerText = "";
+                UI.typerFeedback.className = "mt-6 text-2xl font-bold p-4 rounded-xl min-h-[60px]";
+            }
+        }
+
+        window.submitWord = function() {
+            const typedWord = UI.wordInput.value.toLowerCase().trim();
+            if(!typedWord) return;
+
+            alert("Woord verstuurd! Je maatje gaat het controleren.");
+            
+            UI.typerAnswer.innerText = typedWord;
+            UI.typerAnswer.className = "text-5xl font-mono font-bold text-blue-600 mb-4 tracking-wider bg-blue-50 p-2 rounded-lg";
+        };
+
+        window.sendFeedback = function(isCorrect) {
+            if(isCorrect) {
+                const typedWord = UI.typerAnswer.innerText;
+                
+                if(typedWord === state.currentPart.naam) {
+                    alert(`Super gedaan! Het woord was inderdaad ${state.currentPart.naam.toUpperCase()}. +1 Groeipunt voor jullie allebei! 🎉`);
+                    setupRound();
+                } else {
+                    alert(`Bijna! Je maatje dacht dat het goed was, maar het woord is: ${state.currentPart.naam.toUpperCase()}. Probeer het nog eens samen.`);
+                }
+            } else {
+                alert("Niet erg! Geef je maatje een tip (bijvoorbeeld: 'Het begint met de O').");
+            }
+        };
+
+        const scores = [
+            {n: "Ahmed", p: 18}, {n: "Lina", p: 15}, {n: "Kyan", p: 12}, {n: "Mila", p: 9}, {n: "Corianne's Klas", p: "❤️"}
+        ];
+        scores.forEach((s, index) => {
+            const medal = index === 0 ? "🥇 " : (index === 1 ? "🥈 " : (index === 2 ? "🥉 " : (index === 4 ? "👩‍🏫 " : "⭐ ")));
+            UI.leaderboard.innerHTML += `
+                <div class="flex justify-between items-center border-b border-gray-100 py-3 px-2 ${index < 3 ? 'bg-green-50 rounded' : ''}">
+                    <span class="text-lg text-gray-800">${medal}${s.n}</span>
+                    <span class="font-bold text-green-600 bg-white px-3 py-1 rounded-full shadow-sm">${s.p} ptn</span>
+                </div>`;
+        });
+
+    </script>
+</body>
+</html>
