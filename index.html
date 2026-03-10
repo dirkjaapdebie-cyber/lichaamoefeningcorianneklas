@@ -3,82 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medisch Lab Corianne - Anatomie</title>
+    <title>Anatomie Lab - Corianne</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Quicksand', sans-serif; background: #f0f9ff; }
-        .medical-card { background: white; border-radius: 2rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border: 2px solid #e2e8f0; }
-        .type-terminal { font-family: 'Space Mono', monospace; background: #0f172a; color: #4ade80; border: 4px solid #334155; }
-        .admin-section { background: #f8fafc; border-top: 8px solid #3b82f6; margin-top: 80px; padding: 40px; border-radius: 3rem; }
-        .img-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; background: #e2e8f0; border: 1px solid #cbd5e1; }
+        body { font-family: 'Quicksand', sans-serif; background: #f8fafc; }
+        .medical-card { background: white; border-radius: 2rem; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .terminal { font-family: 'Space Mono', monospace; background: #0f172a; color: #4ade80; }
+        .img-container { background: #f1f5f9; border-radius: 1.5rem; display: flex; align-items: center; justify-content: center; overflow: hidden; }
     </style>
 </head>
-<body class="p-4">
+<body class="p-6">
 
-    <div id="setup-screen" class="max-w-md mx-auto medical-card p-10 mt-10 shadow-2xl">
-        <h2 class="text-2xl font-black text-center text-slate-700 mb-6 uppercase tracking-tight">🩺 Medisch Lab</h2>
+    <div id="setup-screen" class="max-w-md mx-auto medical-card p-10 mt-10 text-center">
+        <h1 class="text-3xl font-black text-blue-600 mb-6 uppercase">HET LAB 🩺</h1>
         <div class="space-y-4">
-            <input type="text" id="p1-name" placeholder="Dokter 1 (Vrager)" class="w-full p-4 border-2 rounded-2xl outline-none focus:border-blue-500">
-            <input type="text" id="p2-name" placeholder="Dokter 2 (Typer)" class="w-full p-4 border-2 rounded-2xl outline-none focus:border-blue-500">
-            <button onclick="startApp()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black text-xl hover:bg-blue-700 shadow-lg">START TEST 🚀</button>
+            <input type="text" id="p1-name" placeholder="Dokter 1 (Vrager)" class="w-full p-4 border rounded-2xl outline-none focus:ring-2 ring-blue-500">
+            <input type="text" id="p2-name" placeholder="Dokter 2 (Typer)" class="w-full p-4 border rounded-2xl outline-none focus:ring-2 ring-blue-500">
+            <button onclick="startApp()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold text-xl hover:bg-blue-700 transition">START ONDERZOEK</button>
         </div>
     </div>
 
-    <div id="game-screen" class="hidden max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
-        <div class="medical-card p-8 border-t-[10px] border-amber-400">
-            <div class="flex justify-between items-center mb-4"><span class="font-bold text-slate-400 text-xs uppercase">Analyse Unit</span><span id="display-p1" class="font-black text-blue-600"></span></div>
-            <div class="bg-slate-50 p-4 rounded-3xl flex justify-center mb-6 border-2 border-dashed min-h-[250px] items-center">
-                <img id="current-image" src="" class="max-h-60 rounded-xl shadow-md" onerror="this.src='https://via.placeholder.com/300?text=Bestand+niet+gevonden'">
+    <div id="game-screen" class="hidden max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 mt-6">
+        <div class="medical-card p-8 border-t-[12px] border-amber-400">
+            <div class="flex justify-between mb-4 font-bold text-slate-400 uppercase text-xs"><span>Scan resultaat</span><span id="display-p1"></span></div>
+            <div class="img-container h-64 mb-6 border-2 border-dashed border-slate-300">
+                <img id="current-image" src="" class="max-h-full max-w-full object-contain">
+                <div id="img-error" class="hidden text-rose-500 font-bold p-4 text-center">❌ Kan bestand niet vinden</div>
             </div>
-            <div id="live-text-view" class="type-terminal p-6 rounded-2xl text-3xl text-center min-h-[80px] flex items-center justify-center uppercase tracking-widest">...</div>
-            <div id="correction-result" class="mt-4 p-4 rounded-xl font-bold text-center min-h-[60px]"></div>
-            <div class="flex justify-center gap-6 mt-4">
-                <button onclick="check(true)" class="bg-emerald-500 text-white w-20 h-20 rounded-full text-4xl shadow-lg hover:scale-105 active:scale-95">👍</button>
-                <button onclick="check(false)" class="bg-rose-500 text-white w-20 h-20 rounded-full text-4xl shadow-lg hover:scale-105 active:scale-95">👎</button>
+            <div id="live-text-view" class="terminal p-6 rounded-2xl text-3xl text-center min-h-[80px] flex items-center justify-center uppercase">...</div>
+            <div id="correction-result" class="mt-4 p-4 rounded-xl font-bold text-center min-h-[60px] text-lg"></div>
+            <div class="flex justify-center gap-8 mt-6">
+                <button onclick="check(true)" class="bg-emerald-500 text-white w-20 h-20 rounded-full text-4xl shadow-lg hover:scale-105 transition">👍</button>
+                <button onclick="check(false)" class="bg-rose-500 text-white w-20 h-20 rounded-full text-4xl shadow-lg hover:scale-105 transition">👎</button>
             </div>
         </div>
 
-        <div class="medical-card p-8 border-t-[10px] border-blue-500">
-            <div class="flex justify-between items-center mb-4"><span class="font-bold text-slate-400 text-xs uppercase">Terminal</span><span id="display-p2" class="font-black text-blue-600"></span></div>
-            <input type="text" id="main-input" oninput="syncInput()" class="type-terminal w-full p-8 rounded-3xl text-4xl text-center outline-none uppercase tracking-widest" placeholder="TYPEN..." autocomplete="off">
-            <div id="timer-display" class="mt-12 text-center text-3xl font-mono text-blue-500 font-bold">00s</div>
+        <div class="medical-card p-8 border-t-[12px] border-blue-500">
+            <div class="flex justify-between mb-4 font-bold text-slate-400 uppercase text-xs"><span>Invoermodule</span><span id="display-p2"></span></div>
+            <input type="text" id="main-input" oninput="syncInput()" class="terminal w-full p-8 rounded-3xl text-4xl text-center outline-none uppercase" placeholder="TYP HIER..." autocomplete="off">
+            <div id="timer-display" class="mt-12 text-center text-4xl font-mono text-blue-500 font-bold">00s</div>
         </div>
     </div>
 
-    <div id="leaderboard-section" class="max-w-2xl mx-auto mt-10 p-6">
-        <h3 class="text-center font-black text-slate-400 uppercase tracking-widest text-sm mb-6">🏆 Team Scorebord</h3>
+    <div id="leaderboard-section" class="max-w-2xl mx-auto mt-12 p-6">
+        <h3 class="text-center font-bold text-slate-400 uppercase tracking-widest text-sm mb-4">Top Diagnoses</h3>
         <div id="leaderboard-list" class="space-y-2"></div>
     </div>
 
-    <section class="max-w-6xl mx-auto admin-section shadow-inner">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-black text-slate-800 uppercase">⚙️ Lab Beheer</h2>
-            <button onclick="resetLeaderboard()" class="bg-rose-500 text-white px-6 py-2 rounded-xl font-bold shadow-md">WISSEN SCOREBORD</button>
+    <section class="max-w-6xl mx-auto mt-20 p-10 bg-white rounded-[3rem] border-4 border-slate-100">
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="text-2xl font-black text-slate-800 uppercase">⚙️ Lab Beheer & Diagnose</h2>
+            <button onclick="resetLeaderboard()" class="bg-rose-100 text-rose-600 px-6 py-2 rounded-xl font-bold">Reset Scorebord</button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="teacher-grid">
+        <div id="teacher-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             </div>
     </section>
 
     <script>
-        // De bestandsnamen zijn nu DIRECT (geen 'beelden/' meer)
+        // Database met ALLES op .png
         let bodyParts = [
-            { id: "arm.png", lw: "de", naam: "arm" }, { id: "been.png", lw: "het", naam: "been" },
-            { id: "billen.png", lw: "de", naam: "billen" }, { id: "buik.png", lw: "de", naam: "buik" },
-            { id: "gebit.png", lw: "het", naam: "gebit" }, { id: "haar.png", lw: "het", naam: "haar" },
-            { id: "hals.png", lw: "de", naam: "hals" }, { id: "hand.png", lw: "de", naam: "hand" },
-            { id: "hart.png", lw: "het", naam: "hart" }, { id: "hersenen.png", lw: "de", naam: "hersenen" },
-            { id: "heup.png", lw: "de", naam: "heup" }, { id: "hiel.png", lw: "de", naam: "hiel" },
-            { id: "keel.png", lw: "de", naam: "keel" }, { id: "kies.png", lw: "de", naam: "kies" },
-            { id: "knie.png", lw: "de", naam: "knie" }, { id: "kruin.png", lw: "de", naam: "kruin" },
-            { id: "longen.png", lw: "de", naam: "longen" }, { id: "mond.png", lw: "de", naam: "mond" },
-            { id: "nagel.png", lw: "de", naam: "nagel" }, { id: "navel.png", lw: "de", naam: "navel" },
-            { id: "neus.png", lw: "de", naam: "neus" }, { id: "nies.png", lw: "de", naam: "nies" },
-            { id: "oog.png", lw: "het", naam: "oog" }, { id: "pillen.png", lw: "de", naam: "pillen" },
-            { id: "rug.png", lw: "de", naam: "rug" }, { id: "schouder.png", lw: "de", naam: "schouder" },
-            { id: "schouder1.png", lw: "de", naam: "schouder" }, { id: "teen.png", lw: "de", naam: "teen" },
-            { id: "tong.png", lw: "de", naam: "tong" }
+            { id: "kruin.png", lw: "de", naam: "kruin" },
+            { id: "voorhoofd.png", lw: "het", naam: "voorhoofd" },
+            { id: "wenkbrauw.png", lw: "de", naam: "wenkbrauw" },
+            { id: "oog.png", lw: "het", naam: "oog" },
+            { id: "neus.png", lw: "de", naam: "neus" },
+            { id: "mond.png", lw: "de", naam: "mond" },
+            { id: "keel.png", lw: "de", naam: "keel" },
+            { id: "hals.png", lw: "de", naam: "hals" },
+            { id: "schouder.png", lw: "de", naam: "schouder" },
+            { id: "rug.png", lw: "de", naam: "rug" }
         ];
 
         let state = { p1: "", p2: "", current: null, startTime: 0, timer: null };
@@ -86,7 +81,7 @@
         function startApp() {
             state.p1 = document.getElementById('p1-name').value;
             state.p2 = document.getElementById('p2-name').value;
-            if(!state.p1 || !state.p2) return alert("Beide namen invullen!");
+            if(!state.p1 || !state.p2) return alert("Beide dokters moeten inloggen!");
             document.getElementById('setup-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
             document.getElementById('display-p1').innerText = state.p1;
@@ -94,14 +89,26 @@
             state.startTime = Date.now();
             state.timer = setInterval(() => {
                 const s = Math.floor((Date.now() - state.startTime) / 1000);
-                document.getElementById('timer-display').innerText = `${s}s`;
+                document.getElementById('timer-display').innerText = s + "s";
             }, 1000);
             nextRound();
         }
 
         function nextRound() {
             state.current = bodyParts[Math.floor(Math.random() * bodyParts.length)];
-            document.getElementById('current-image').src = state.current.id; // DIRECT PAD
+            const img = document.getElementById('current-image');
+            const err = document.getElementById('img-error');
+            
+            img.classList.remove('hidden');
+            err.classList.add('hidden');
+            
+            img.onerror = () => {
+                img.classList.add('hidden');
+                err.classList.remove('hidden');
+                err.innerText = "Fout: " + state.current.id + " niet gevonden";
+            };
+            
+            img.src = state.current.id; // Zoekt in dezelfde map
             document.getElementById('main-input').value = "";
             document.getElementById('live-text-view').innerText = "...";
             document.getElementById('correction-result').innerText = "";
@@ -115,12 +122,12 @@
             const resBox = document.getElementById('correction-result');
             if(isOk && typed === state.current.naam) {
                 const s = Math.floor((Date.now() - state.startTime) / 1000);
-                resBox.innerText = `✅ PERFECT: ${state.current.lw.toUpperCase()} ${state.current.naam.toUpperCase()}`;
+                resBox.innerText = `✅ CORRECT: ${state.current.lw.toUpperCase()} ${state.current.naam.toUpperCase()}`;
                 resBox.className = "mt-4 p-4 rounded-xl font-bold text-center bg-emerald-100 text-emerald-700 animate-bounce";
                 addLeaderboard(s);
                 setTimeout(() => { state.startTime = Date.now(); nextRound(); }, 2000);
             } else {
-                resBox.innerText = "❌ KIJK GOED OF PROBEER OPNIEUW";
+                resBox.innerText = "❌ KIJK GOED OF TYP OPNIEUW";
                 resBox.className = "mt-4 p-4 rounded-xl font-bold text-center bg-rose-100 text-rose-700";
             }
         }
@@ -128,27 +135,25 @@
         function addLeaderboard(t) {
             const list = document.getElementById('leaderboard-list');
             const row = document.createElement('div');
-            row.className = "flex justify-between bg-white p-3 rounded-xl border-2 border-slate-100";
-            row.innerHTML = `<span class="font-bold">Dokters ${state.p1} & ${state.p2}</span><span class="bg-blue-600 text-white px-3 py-1 rounded-lg font-mono font-bold">${t}s</span>`;
+            row.className = "flex justify-between bg-white p-3 rounded-xl border shadow-sm";
+            row.innerHTML = `<span class="font-bold">${state.p1} & ${state.p2}</span><span class="text-blue-600 font-mono font-bold">${t}s</span>`;
             list.prepend(row);
         }
 
-        function resetLeaderboard() {
-            if(confirm("Scorebord wissen?")) document.getElementById('leaderboard-list').innerHTML = "";
-        }
+        function resetLeaderboard() { document.getElementById('leaderboard-list').innerHTML = ""; }
 
         function renderTeacher() {
             const grid = document.getElementById('teacher-grid');
             bodyParts.forEach(item => {
                 const card = document.createElement('div');
-                card.className = "bg-white p-3 rounded-2xl border flex items-center gap-3 shadow-sm";
-                card.innerHTML = `
-                    <img src="${item.id}" class="img-thumb" onerror="this.parentNode.style.opacity='0.5'; this.src='https://via.placeholder.com/60?text=Error'">
-                    <div>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">${item.id}</p>
-                        <p class="text-xs font-black text-slate-700">${item.lw} ${item.naam}</p>
-                    </div>
-                `;
+                card.className = "bg-slate-50 p-2 rounded-xl border text-center text-[10px]";
+                
+                // Test afbeelding laden
+                const testImg = new Image();
+                testImg.src = item.id;
+                testImg.onload = () => card.innerHTML = `<div class="text-emerald-500 font-bold mb-1 uppercase">✅ OK</div><img src="${item.id}" class="h-12 w-full object-contain mb-1"><p>${item.id}</p>`;
+                testImg.onerror = () => card.innerHTML = `<div class="text-rose-500 font-bold mb-1 uppercase">❌ MIS</div><div class="h-12 bg-slate-200 rounded mb-1"></div><p>${item.id}</p>`;
+                
                 grid.appendChild(card);
             });
         }
