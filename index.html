@@ -3,137 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medisch Lab Corianne - Anatomie Expert</title>
+    <title>Medisch Lab Corianne - Anatomie</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Quicksand', sans-serif; background: #f0f9ff; }
         .medical-card { background: white; border-radius: 2rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border: 2px solid #e2e8f0; }
         .type-terminal { font-family: 'Space Mono', monospace; background: #0f172a; color: #4ade80; border: 4px solid #334155; }
-        .admin-section { background: #f8fafc; border-top: 8px solid #3b82f6; margin-top: 100px; padding: 40px; border-radius: 4rem 4rem 0 0; }
-        .img-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; background: #f1f5f9; }
+        .admin-section { background: #f8fafc; border-top: 8px solid #3b82f6; margin-top: 80px; padding: 40px; border-radius: 3rem; }
+        .img-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 12px; background: #e2e8f0; border: 1px solid #cbd5e1; }
     </style>
 </head>
 <body class="p-4">
 
-    <header class="max-w-5xl mx-auto text-center py-6">
-        <div class="inline-block bg-blue-600 text-white px-6 py-1 rounded-full text-sm font-bold shadow-md mb-2">🏥 MEDISCH TRAININGSCENTRUM</div>
-        <h1 class="text-4xl font-black text-slate-800">Anatomie Lab</h1>
-    </header>
-
-    <div id="setup-screen" class="max-w-md mx-auto medical-card p-10 mt-10">
-        <h2 class="text-2xl font-bold text-center text-slate-700 mb-6">Nieuw Onderzoek</h2>
-        <input type="text" id="p1-name" placeholder="Naam Vrager (L1)" class="w-full p-4 border rounded-2xl mb-4 outline-none focus:ring-2 ring-blue-400">
-        <input type="text" id="p2-name" placeholder="Naam Typer (L2)" class="w-full p-4 border rounded-2xl mb-6 outline-none focus:ring-2 ring-blue-400">
-        <button onclick="startApp()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold text-xl hover:bg-blue-700 shadow-lg transition">START LAB 🚀</button>
+    <div id="setup-screen" class="max-w-md mx-auto medical-card p-10 mt-10 shadow-2xl">
+        <h2 class="text-2xl font-black text-center text-slate-700 mb-6 uppercase tracking-tight">🩺 Medisch Lab</h2>
+        <div class="space-y-4">
+            <input type="text" id="p1-name" placeholder="Dokter 1 (Vrager)" class="w-full p-4 border-2 rounded-2xl outline-none focus:border-blue-500">
+            <input type="text" id="p2-name" placeholder="Dokter 2 (Typer)" class="w-full p-4 border-2 rounded-2xl outline-none focus:border-blue-500">
+            <button onclick="startApp()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black text-xl hover:bg-blue-700 shadow-lg">START TEST 🚀</button>
+        </div>
     </div>
 
-    <div id="game-screen" class="hidden max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
+    <div id="game-screen" class="hidden max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
         <div class="medical-card p-8 border-t-[10px] border-amber-400">
-            <div class="flex justify-between items-center mb-4"><span class="font-bold text-slate-400 uppercase text-xs">Diagnose Scherm</span><span id="display-p1" class="font-black text-blue-600"></span></div>
-            <div class="bg-slate-50 p-4 rounded-3xl flex justify-center mb-6 border-2 border-dashed border-slate-200 min-h-[250px] items-center">
-                <img id="current-image" src="" class="max-h-60 object-contain rounded-xl shadow-sm">
+            <div class="flex justify-between items-center mb-4"><span class="font-bold text-slate-400 text-xs uppercase">Analyse Unit</span><span id="display-p1" class="font-black text-blue-600"></span></div>
+            <div class="bg-slate-50 p-4 rounded-3xl flex justify-center mb-6 border-2 border-dashed min-h-[250px] items-center">
+                <img id="current-image" src="" class="max-h-60 rounded-xl shadow-md" onerror="this.src='https://via.placeholder.com/300?text=Bestand+niet+gevonden'">
             </div>
             <div id="live-text-view" class="type-terminal p-6 rounded-2xl text-3xl text-center min-h-[80px] flex items-center justify-center uppercase tracking-widest">...</div>
-            <div id="correction-result" class="mt-4 p-4 rounded-xl font-bold text-center min-h-[60px] text-lg"></div>
+            <div id="correction-result" class="mt-4 p-4 rounded-xl font-bold text-center min-h-[60px]"></div>
             <div class="flex justify-center gap-6 mt-4">
-                <button onclick="check(true)" class="bg-emerald-500 text-white w-20 h-20 rounded-full text-4xl shadow-lg hover:scale-105 active:scale-95 transition">👍</button>
-                <button onclick="check(false)" class="bg-rose-500 text-white w-20 h-20 rounded-full text-4xl shadow-lg hover:scale-105 active:scale-95 transition">👎</button>
+                <button onclick="check(true)" class="bg-emerald-500 text-white w-20 h-20 rounded-full text-4xl shadow-lg hover:scale-105 active:scale-95">👍</button>
+                <button onclick="check(false)" class="bg-rose-500 text-white w-20 h-20 rounded-full text-4xl shadow-lg hover:scale-105 active:scale-95">👎</button>
             </div>
         </div>
 
         <div class="medical-card p-8 border-t-[10px] border-blue-500">
-            <div class="flex justify-between items-center mb-4"><span class="font-bold text-slate-400 uppercase text-xs">Input Terminal</span><span id="display-p2" class="font-black text-blue-600"></span></div>
-            <p class="text-slate-500 font-bold mb-4 italic">Typ wat je maatje zegt:</p>
-            <input type="text" id="main-input" oninput="syncInput()" class="type-terminal w-full p-8 rounded-3xl text-4xl text-center outline-none focus:ring-4 ring-blue-100 uppercase" autocomplete="off" spellcheck="false">
+            <div class="flex justify-between items-center mb-4"><span class="font-bold text-slate-400 text-xs uppercase">Terminal</span><span id="display-p2" class="font-black text-blue-600"></span></div>
+            <input type="text" id="main-input" oninput="syncInput()" class="type-terminal w-full p-8 rounded-3xl text-4xl text-center outline-none uppercase tracking-widest" placeholder="TYPEN..." autocomplete="off">
             <div id="timer-display" class="mt-12 text-center text-3xl font-mono text-blue-500 font-bold">00s</div>
         </div>
     </div>
 
-    <div id="leaderboard-section" class="max-w-2xl mx-auto mt-12 p-6">
-        <h3 class="text-center font-black text-slate-400 uppercase tracking-widest text-sm mb-6">🏆 Snelste Diagnose Teams</h3>
-        <div id="leaderboard-list" class="space-y-3">
-            <p class="text-center text-slate-400 italic">Nog geen resultaten...</p>
-        </div>
+    <div id="leaderboard-section" class="max-w-2xl mx-auto mt-10 p-6">
+        <h3 class="text-center font-black text-slate-400 uppercase tracking-widest text-sm mb-6">🏆 Team Scorebord</h3>
+        <div id="leaderboard-list" class="space-y-2"></div>
     </div>
 
-    <section class="max-w-6xl mx-auto admin-section">
-        <div class="flex flex-wrap justify-between items-center mb-10 gap-4">
-            <div>
-                <h2 class="text-3xl font-black text-slate-800">⚙️ Docenten Controlepaneel</h2>
-                <p class="text-slate-500">Beheer de leerstof en het klasbord.</p>
-            </div>
-            <div class="flex gap-3">
-                <button onclick="resetLeaderboard()" class="bg-rose-100 text-rose-600 px-6 py-2 rounded-xl font-bold hover:bg-rose-200 transition">🗑️ Reset Leaderboard</button>
-                <button onclick="exportList()" class="bg-blue-100 text-blue-600 px-6 py-2 rounded-xl font-bold hover:bg-blue-200 transition">📋 Exporteer Lijst</button>
-            </div>
+    <section class="max-w-6xl mx-auto admin-section shadow-inner">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-black text-slate-800 uppercase">⚙️ Lab Beheer</h2>
+            <button onclick="resetLeaderboard()" class="bg-rose-500 text-white px-6 py-2 rounded-xl font-bold shadow-md">WISSEN SCOREBORD</button>
         </div>
 
-        <div class="bg-white p-8 rounded-[2rem] shadow-sm border-2 border-blue-100 mb-10">
-            <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2"><span>➕</span> Nieuw woord toevoegen</h3>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 italic">
-                <select id="new-lw" class="p-4 border rounded-2xl bg-slate-50">
-                    <option value="de">de</option>
-                    <option value="het">het</option>
-                </select>
-                <input type="text" id="new-name" placeholder="Naam (bijv. knie)" class="p-4 border rounded-2xl bg-slate-50 outline-none focus:border-blue-400">
-                <input type="file" id="new-file" accept="image/*" class="p-2 text-xs">
-                <button onclick="addNewWord()" class="bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 transition">VOEG TOE</button>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="teacher-grid">
             </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="teacher-grid"></div>
     </section>
 
     <script>
-        // Database
+        // De bestandsnamen zijn nu DIRECT (geen 'beelden/' meer)
         let bodyParts = [
-            { id: "arm", lw: "de", naam: "arm", src: "beelden/arm.png" }, { id: "been", lw: "het", naam: "been", src: "beelden/been.png" },
-            { id: "billen", lw: "de", naam: "billen", src: "beelden/billen.png" }, { id: "buik", lw: "de", naam: "buik", src: "beelden/buik.png" },
-            { id: "gebit", lw: "het", naam: "gebit", src: "beelden/gebit.png" }, { id: "haar", lw: "het", naam: "haar", src: "beelden/haar.png" },
-            { id: "hals", lw: "de", naam: "hals", src: "beelden/hals.png" }, { id: "hand", lw: "de", naam: "hand", src: "beelden/hand.png" },
-            { id: "hart", lw: "het", naam: "hart", src: "beelden/hart.png" }, { id: "hersenen", lw: "de", naam: "hersenen", src: "beelden/hersenen.png" },
-            { id: "heup", lw: "de", naam: "heup", src: "beelden/heup.png" }, { id: "hiel", lw: "de", naam: "hiel", src: "beelden/hiel.png" },
-            { id: "keel", lw: "de", naam: "keel", src: "beelden/keel.png" }, { id: "kies", lw: "de", naam: "kies", src: "beelden/kies.png" },
-            { id: "knie", lw: "de", naam: "knie", src: "beelden/knie.png" }, { id: "kruin", lw: "de", naam: "kruin", src: "beelden/kruin.png" },
-            { id: "longen", lw: "de", naam: "longen", src: "beelden/longen.png" }, { id: "mond", lw: "de", naam: "mond", src: "beelden/mond.png" },
-            { id: "nagel", lw: "de", naam: "nagel", src: "beelden/nagel.png" }, { id: "navel", lw: "de", naam: "navel", src: "beelden/navel.png" },
-            { id: "neus", lw: "de", naam: "neus", src: "beelden/neus.png" }, { id: "nies", lw: "de", naam: "nies", src: "beelden/nies.png" },
-            { id: "oog", lw: "het", naam: "oog", src: "beelden/oog.png" }, { id: "pillen", lw: "de", naam: "pillen", src: "beelden/pillen.png" },
-            { id: "rug", lw: "de", naam: "rug", src: "beelden/rug.png" }, { id: "schouder", lw: "de", naam: "schouder", src: "beelden/schouder.png" },
-            { id: "schouder1", lw: "de", naam: "schouder", src: "beelden/schouder1.png" }, { id: "teen", lw: "de", naam: "teen", src: "beelden/teen.png" },
-            { id: "tong", lw: "de", naam: "tong", src: "beelden/tong.png" }
+            { id: "arm.png", lw: "de", naam: "arm" }, { id: "been.png", lw: "het", naam: "been" },
+            { id: "billen.png", lw: "de", naam: "billen" }, { id: "buik.png", lw: "de", naam: "buik" },
+            { id: "gebit.png", lw: "het", naam: "gebit" }, { id: "haar.png", lw: "het", naam: "haar" },
+            { id: "hals.png", lw: "de", naam: "hals" }, { id: "hand.png", lw: "de", naam: "hand" },
+            { id: "hart.png", lw: "het", naam: "hart" }, { id: "hersenen.png", lw: "de", naam: "hersenen" },
+            { id: "heup.png", lw: "de", naam: "heup" }, { id: "hiel.png", lw: "de", naam: "hiel" },
+            { id: "keel.png", lw: "de", naam: "keel" }, { id: "kies.png", lw: "de", naam: "kies" },
+            { id: "knie.png", lw: "de", naam: "knie" }, { id: "kruin.png", lw: "de", naam: "kruin" },
+            { id: "longen.png", lw: "de", naam: "longen" }, { id: "mond.png", lw: "de", naam: "mond" },
+            { id: "nagel.png", lw: "de", naam: "nagel" }, { id: "navel.png", lw: "de", naam: "navel" },
+            { id: "neus.png", lw: "de", naam: "neus" }, { id: "nies.png", lw: "de", naam: "nies" },
+            { id: "oog.png", lw: "het", naam: "oog" }, { id: "pillen.png", lw: "de", naam: "pillen" },
+            { id: "rug.png", lw: "de", naam: "rug" }, { id: "schouder.png", lw: "de", naam: "schouder" },
+            { id: "schouder1.png", lw: "de", naam: "schouder" }, { id: "teen.png", lw: "de", naam: "teen" },
+            { id: "tong.png", lw: "de", naam: "tong" }
         ];
 
         let state = { p1: "", p2: "", current: null, startTime: 0, timer: null };
 
-        // --- SPEL FUNCTIES ---
         function startApp() {
             state.p1 = document.getElementById('p1-name').value;
             state.p2 = document.getElementById('p2-name').value;
-            if(!state.p1 || !state.p2) return alert("Beide namen invullen a.u.b.");
+            if(!state.p1 || !state.p2) return alert("Beide namen invullen!");
             document.getElementById('setup-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
             document.getElementById('display-p1').innerText = state.p1;
             document.getElementById('display-p2').innerText = state.p2;
             state.startTime = Date.now();
-            runTimer(); nextRound();
-        }
-
-        function runTimer() {
             state.timer = setInterval(() => {
                 const s = Math.floor((Date.now() - state.startTime) / 1000);
                 document.getElementById('timer-display').innerText = `${s}s`;
             }, 1000);
+            nextRound();
         }
 
         function nextRound() {
             state.current = bodyParts[Math.floor(Math.random() * bodyParts.length)];
-            document.getElementById('current-image').src = state.current.src;
+            document.getElementById('current-image').src = state.current.id; // DIRECT PAD
             document.getElementById('main-input').value = "";
             document.getElementById('live-text-view').innerText = "...";
             document.getElementById('correction-result').innerText = "";
-            document.getElementById('correction-result').className = "mt-4 p-4 rounded-xl font-bold text-center min-h-[60px]";
+            document.getElementById('correction-result').className = "";
         }
 
         function syncInput() { document.getElementById('live-text-view').innerText = document.getElementById('main-input').value; }
@@ -143,73 +115,44 @@
             const resBox = document.getElementById('correction-result');
             if(isOk && typed === state.current.naam) {
                 const s = Math.floor((Date.now() - state.startTime) / 1000);
-                resBox.innerText = `✅ PERFECT! HET IS: ${state.current.lw.toUpperCase()} ${state.current.naam.toUpperCase()}`;
+                resBox.innerText = `✅ PERFECT: ${state.current.lw.toUpperCase()} ${state.current.naam.toUpperCase()}`;
                 resBox.className = "mt-4 p-4 rounded-xl font-bold text-center bg-emerald-100 text-emerald-700 animate-bounce";
-                setTimeout(() => { addLeaderboard(s); state.startTime = Date.now(); nextRound(); }, 2000);
+                addLeaderboard(s);
+                setTimeout(() => { state.startTime = Date.now(); nextRound(); }, 2000);
             } else {
-                resBox.innerText = "❌ PROBEER HET NOG EENS";
+                resBox.innerText = "❌ KIJK GOED OF PROBEER OPNIEUW";
                 resBox.className = "mt-4 p-4 rounded-xl font-bold text-center bg-rose-100 text-rose-700";
-            }
-        }
-
-        // --- DOCENTEN FUNCTIES ---
-        function resetLeaderboard() {
-            if(confirm("Weet je zeker dat je alle namen en tijden wilt verwijderen?")) {
-                document.getElementById('leaderboard-list').innerHTML = '<p class="text-center text-slate-400 italic">Nog geen resultaten...</p>';
             }
         }
 
         function addLeaderboard(t) {
             const list = document.getElementById('leaderboard-list');
-            if(list.innerText.includes("Nog geen resultaten")) list.innerHTML = "";
             const row = document.createElement('div');
-            row.className = "flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-100";
-            row.innerHTML = `<span class="font-bold text-slate-700">🤝 ${state.p1} & ${state.p2}</span><span class="bg-blue-600 text-white px-4 py-1 rounded-lg font-mono font-bold">${t}s</span>`;
+            row.className = "flex justify-between bg-white p-3 rounded-xl border-2 border-slate-100";
+            row.innerHTML = `<span class="font-bold">Dokters ${state.p1} & ${state.p2}</span><span class="bg-blue-600 text-white px-3 py-1 rounded-lg font-mono font-bold">${t}s</span>`;
             list.prepend(row);
         }
 
-        function renderTeacherPanel() {
+        function resetLeaderboard() {
+            if(confirm("Scorebord wissen?")) document.getElementById('leaderboard-list').innerHTML = "";
+        }
+
+        function renderTeacher() {
             const grid = document.getElementById('teacher-grid');
-            grid.innerHTML = "";
-            bodyParts.forEach((item, index) => {
+            bodyParts.forEach(item => {
                 const card = document.createElement('div');
-                card.className = "bg-white p-3 rounded-2xl border flex items-center gap-3";
+                card.className = "bg-white p-3 rounded-2xl border flex items-center gap-3 shadow-sm";
                 card.innerHTML = `
-                    <img src="${item.src}" class="img-thumb" onerror="this.src='https://via.placeholder.com/50?text=?'">
-                    <div class="flex-1">
-                        <div class="flex gap-1">
-                            <input type="text" value="${item.lw}" onchange="updateData(${index}, 'lw', this.value)" class="w-10 border rounded text-xs text-center p-1">
-                            <input type="text" value="${item.naam}" onchange="updateData(${index}, 'naam', this.value)" class="flex-1 border rounded text-xs p-1 font-bold">
-                            <button onclick="bodyParts.splice(${index},1);renderTeacherPanel()" class="text-rose-400 text-xs">🗑️</button>
-                        </div>
+                    <img src="${item.id}" class="img-thumb" onerror="this.parentNode.style.opacity='0.5'; this.src='https://via.placeholder.com/60?text=Error'">
+                    <div>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">${item.id}</p>
+                        <p class="text-xs font-black text-slate-700">${item.lw} ${item.naam}</p>
                     </div>
                 `;
                 grid.appendChild(card);
             });
         }
-
-        function addNewWord() {
-            const lw = document.getElementById('new-lw').value;
-            const name = document.getElementById('new-name').value.trim().toLowerCase();
-            const fileInput = document.getElementById('new-file');
-            if(!name || !fileInput.files[0]) return alert("Naam en foto verplicht!");
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                bodyParts.push({ id: name, lw: lw, naam: name, src: e.target.result });
-                renderTeacherPanel();
-                document.getElementById('new-name').value = "";
-            };
-            reader.readAsDataURL(fileInput.files[0]);
-        }
-
-        function exportList() {
-            const data = JSON.stringify(bodyParts, null, 2);
-            console.log(data);
-            alert("De woordenlijst is naar de 'Console' van je browser gestuurd. (F12 -> Console)");
-        }
-
-        window.updateData = (idx, field, val) => { bodyParts[idx][field] = val.toLowerCase().trim(); };
-        renderTeacherPanel();
+        renderTeacher();
     </script>
 </body>
 </html>
