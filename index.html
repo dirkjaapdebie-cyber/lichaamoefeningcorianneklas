@@ -3,246 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Schakelklas Corianne - Lichaamsdelen Spel</title>
+    <title>Medisch Lab Corianne - Anatomie Master</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
-        /* Zorg dat afbeeldingen mooi binnen het vak passen */
-        .body-part-image { 
-            max-width: 100%; 
-            max-height: 250px; 
-            object-fit: contain; 
-            border-radius: 15px;
-        }
+        body { font-family: 'Quicksand', sans-serif; background: #f0f9ff; }
+        .medical-card { background: white; border: 2px solid #e2e8f0; border-radius: 2rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .type-terminal { font-family: 'Space Mono', monospace; background: #0f172a; color: #4ade80; }
+        .admin-section { background: #f8fafc; border-top: 6px solid #3b82f6; }
+        .img-preview-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 10px; border: 2px solid #cbd5e1; }
     </style>
 </head>
-<body class="bg-blue-50 font-sans min-h-screen flex flex-col items-center p-4">
+<body class="p-4">
 
-    <header class="text-center mb-8 w-full max-w-2xl border-b-2 border-blue-100 pb-4">
-        <h1 class="text-3xl font-bold text-blue-600">Schakelklas Corianne</h1>
-        <p class="text-gray-600">Samen leren we het lichaam kennen!</p>
+    <header class="max-w-5xl mx-auto text-center py-6">
+        <div class="inline-block bg-blue-600 text-white px-6 py-1 rounded-full text-sm font-bold shadow-md mb-2">🏥 MEDISCH TRAININGSCENTRUM</div>
+        <h1 class="text-4xl font-black text-slate-800">Anatomie Lab</h1>
     </header>
 
-    <div id="login-section" class="bg-white p-8 rounded-xl shadow-xl w-full max-w-md border-t-4 border-green-400">
-        <h2 class="text-2xl font-semibold mb-5 text-gray-800 text-center">Hallo! Wie ben jij?</h2>
-        <input type="text" id="username" placeholder="Typ hier je voornaam..." class="w-full p-4 border-2 border-blue-100 rounded-lg mb-5 text-xl focus:border-blue-300 outline-none">
-        <button onclick="startMatchmaking()" class="w-full bg-green-500 text-white py-4 rounded-xl font-bold text-xl hover:bg-green-600 transition shadow-md">Spel Starten! 🚀</button>
+    <div id="setup-screen" class="max-w-md mx-auto medical-card p-10 mt-10">
+        <h2 class="text-2xl font-bold text-center text-slate-700 mb-6">Start Nieuw Onderzoek</h2>
+        <input type="text" id="p1-name" placeholder="Naam Leerling 1 (Vrager)" class="w-full p-4 border rounded-2xl mb-4 outline-none focus:ring-2 ring-blue-400">
+        <input type="text" id="p2-name" placeholder="Naam Leerling 2 (Typer)" class="w-full p-4 border rounded-2xl mb-6 outline-none focus:ring-2 ring-blue-400">
+        <button onclick="startApp()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold text-xl hover:bg-blue-700 shadow-lg">START 🚀</button>
     </div>
 
-    <div id="waiting-screen" class="hidden text-center p-8 bg-white rounded-xl shadow-lg w-full max-w-md">
-        <div class="animate-bounce text-6xl mb-5">⏳</div>
-        <p class="text-2xl font-medium text-gray-700">Even geduld...</p>
-        <p class="text-gray-500 mt-2">We zoeken een maatje voor je in de klas.</p>
-    </div>
-
-    <div id="game-screen" class="hidden bg-white p-6 sm:p-8 rounded-3xl shadow-2xl w-full max-w-3xl text-center border-2 border-blue-100">
-        
-        <div class="flex justify-between items-center mb-6 border-b pb-4">
-            <div id="role-indicator" class="text-lg font-bold p-2 px-4 rounded-full bg-blue-100 text-blue-700"></div>
-            <div id="game-status" class="text-sm font-bold text-green-600 bg-green-50 p-2 px-4 rounded-full">Ronde 1</div>
-        </div>
-        
-        <div id="helper-view" class="hidden space-y-6">
-            <h3 class="text-xl font-semibold text-gray-800 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-                🤫 <span class="text-yellow-800">Geheim!</span> Vertel niet wat het is!
-            </h3>
-            
-            <div id="image-container" class="flex justify-center p-4 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 min-h-[200px] items-center">
-                <img id="current-body-image" src="" alt="Lichaamsdeel" class="body-part-image">
+    <div id="game-screen" class="hidden max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
+        <div class="medical-card p-8 border-t-[10px] border-amber-400">
+            <div class="flex justify-between items-center mb-4"><span class="font-bold text-slate-400">DIAGNOSE UNIT</span><span id="display-p1" class="font-black"></span></div>
+            <div class="bg-slate-50 p-4 rounded-3xl flex justify-center mb-6 border-2 border-dashed">
+                <img id="current-image" src="" class="max-h-64 object-contain rounded-xl">
             </div>
-
-            <div class="bg-gray-50 p-4 rounded-xl border">
-                <p class="text-gray-600 mb-2">Heeft je maatje het goed getypt?</p>
-                <p id="typer-answer-display" class="text-3xl font-mono font-bold text-gray-400 mb-4 tracking-wider">[wacht op antwoord...]</p>
-                
-                <div class="flex justify-center gap-6">
-                    <button onclick="sendFeedback(true)" class="text-6xl hover:scale-110 transition bg-green-100 p-4 rounded-full shadow hover:bg-green-200">👍</button>
-                    <button onclick="sendFeedback(false)" class="text-6xl hover:scale-110 transition bg-red-100 p-4 rounded-full shadow hover:bg-red-200">👎</button>
-                </div>
+            <div id="live-text-view" class="type-terminal p-6 rounded-2xl text-3xl text-center min-h-[80px] flex items-center justify-center border-4 border-slate-700 uppercase tracking-widest">...</div>
+            <div id="correction-result" class="mt-4 p-4 rounded-xl font-bold text-center min-h-[60px]"></div>
+            <div class="flex justify-center gap-6 mt-6">
+                <button onclick="check(true)" class="bg-emerald-500 text-white w-20 h-20 rounded-full text-3xl shadow-lg hover:scale-105 transition">👍</button>
+                <button onclick="check(false)" class="bg-rose-500 text-white w-20 h-20 rounded-full text-3xl shadow-lg hover:scale-105 transition">👎</button>
             </div>
         </div>
 
-        <div id="typer-view" class="hidden space-y-6">
-            <h3 class="text-xl font-semibold text-gray-800">Welk lichaamsdeel zie je op het scherm van je maatje?🔍</h3>
-            
-            <input type="text" id="word-input" class="w-full p-5 border-4 border-blue-200 rounded-2xl text-4xl text-center font-bold tracking-widest focus:border-blue-400 outline-none" placeholder="...">
-            
-            <button onclick="submitWord()" class="mt-4 bg-blue-500 text-white px-10 py-4 rounded-full font-bold text-xl shadow-lg hover:bg-blue-600 transition w-full sm:w-auto">Ik heb het getypt! ✅</button>
-            
-            <div id="typer-feedback-message" class="mt-6 text-2xl font-bold p-4 rounded-xl min-h-[60px]">
-                </div>
+        <div class="medical-card p-8 border-t-[10px] border-blue-500">
+            <div class="flex justify-between items-center mb-4"><span class="font-bold text-slate-400">INPUT TERMINAL</span><span id="display-p2" class="font-black"></span></div>
+            <p class="text-slate-500 font-bold mb-4">Voer de benaming in:</p>
+            <input type="text" id="main-input" oninput="syncInput()" class="type-terminal w-full p-8 rounded-3xl text-4xl text-center outline-none border-4 border-slate-800 focus:border-blue-400" autocomplete="off">
+            <div id="timer-display" class="mt-12 text-center text-2xl font-mono text-blue-500">Tijd: 00s</div>
         </div>
     </div>
 
-    <div id="leaderboard" class="mt-12 w-full max-w-md bg-white p-6 rounded-xl shadow border border-gray-100">
-        <h3 class="text-center font-bold text-gray-700 mb-4 text-xl">🏆 Groeipunten van de klas</h3>
-        <div class="space-y-2" id="leaderboard-list">
+    <section class="max-w-6xl mx-auto mt-24 p-10 admin-section rounded-[3rem] shadow-xl">
+        <div class="flex justify-between items-end mb-10">
+            <div>
+                <h2 class="text-3xl font-black text-slate-800">⚙️ Mediabibliotheek & Instellingen</h2>
+                <p class="text-slate-500 font-medium">Beheer afbeeldingen, lidwoorden en namen voor de vragen.</p>
             </div>
-    </div>
+            <div class="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl font-bold">
+                Totaal: <span id="total-count">0</span> woorden
+            </div>
+        </div>
 
-    <script type="module">
-        // Firebase setup (vereenvoudigd, gaat ervan uit dat je dit in een module script draait)
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        <div class="bg-white p-6 rounded-3xl shadow-sm border-2 border-blue-200 mb-10">
+            <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2"><span>➕</span> Nieuwe vraag toevoegen</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <select id="new-lw" class="p-3 border rounded-xl outline-none focus:border-blue-400">
+                    <option value="de">de</option>
+                    <option value="het">het</option>
+                </select>
+                <input type="text" id="new-name" placeholder="Woord (bijv. knie)" class="p-3 border rounded-xl outline-none focus:border-blue-400">
+                <input type="file" id="new-file" accept="image/*" class="p-2 text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                <button onclick="addNewWord()" class="bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition">Voeg toe aan sessie</button>
+            </div>
+        </div>
 
-        // JOUW DATABASE CONFIGURATIE
-        const firebaseConfig = {
-            apiKey: "AIzaSyDxFVlEYMIewTN6bdSOTL3H8el1V3jm-DM",
-            authDomain: "schatgraversemoties.firebaseapp.com",
-            databaseURL: "https://schatgraversemoties-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "schatgraversemoties",
-            storageBucket: "schatgraversemoties.firebasestorage.app",
-            messagingSenderId: "180003857797",
-            appId: "1:180003857797:web:4890f9a02e1ac8c1f150ec"
-        };
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="teacher-grid">
+            </div>
+    </section>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        // --- SPEL DATA EN CONFIGURATIE ---
-        // De volledige lijst met de nieuwe, fotorealistische afbeeldingen
-        const bodyParts = [
-            // Hoofd & Gezicht
-            { id: 1, naam: "haar", pad: "beelden/haar.png" },
-            { id: 2, naam: "kruin", pad: "beelden/kruin.png" },
-            { id: 3, naam: "voorhoofd", pad: "beelden/voorhoofd.png" },
-            { id: 4, naam: "wenkbrauw", pad: "beelden/wenkbrauw.png" },
-            { id: 5, naam: "wimper", pad: "beelden/wimper.png" },
-            { id: 6, naam: "oog", pad: "beelden/oog.png" },
-            { id: 7, naam: "neus", pad: "beelden/neus.png" },
-            { id: 8, naam: "mond", pad: "beelden/mond.png" },
-            { id: 9, naam: "kin", pad: "beelden/kin.png" },
-            
-            // Nek & Torso
-            { id: 10, naam: "nek", pad: "beelden/nek.png" },
-            { id: 11, naam: "hals", pad: "beelden/hals.png" },
-            { id: 12, naam: "schouder", pad: "beelden/schouder.png" },
-            { id: 13, naam: "rug", pad: "beelden/rug.png" },
-            { id: 14, naam: "buik", pad: "beelden/buik.png" },
-            { id: 15, naam: "navel", pad: "beelden/navel.png" },
-            { id: 16, naam: "heup", pad: "beelden/heup.png" },
-            { id: 17, naam: "bil", pad: "beelden/bil.png" },
-            
-            // Armen & Handen
-            { id: 18, naam: "arm", pad: "beelden/arm.png" },
-            
-            // Benen & Voeten
-            { id: 19, naam: "been", pad: "beelden/been.png" },
-            { id: 20, naam: "knie", pad: "beelden/knie.png" },
-            { id: 21, naam: "scheenbeen", pad: "beelden/scheenbeen.png" },
-            { id: 22, naam: "hiel", pad: "beelden/hiel.png" },
-            { id: 23, naam: "voet", pad: "beelden/voet.png" },
-            { id: 24, naam: "teen", pad: "beelden/teen.png" }
+    <script>
+        // Database
+        let bodyParts = [
+            { id: "arm", lw: "de", naam: "arm", src: "beelden/arm.png" }, { id: "been", lw: "het", naam: "been", src: "beelden/been.png" },
+            { id: "billen", lw: "de", naam: "billen", src: "beelden/billen.png" }, { id: "buik", lw: "de", naam: "buik", src: "beelden/buik.png" },
+            { id: "gebit", lw: "het", naam: "gebit", src: "beelden/gebit.png" }, { id: "haar", lw: "het", naam: "haar", src: "beelden/haar.png" },
+            { id: "hals", lw: "de", naam: "hals", src: "beelden/hals.png" }, { id: "hand", lw: "de", naam: "hand", src: "beelden/hand.png" },
+            { id: "hart", lw: "het", naam: "hart", src: "beelden/hart.png" }, { id: "hersenen", lw: "de", naam: "hersenen", src: "beelden/hersenen.png" },
+            { id: "heup", lw: "de", naam: "heup", src: "beelden/heup.png" }, { id: "hiel", lw: "de", naam: "hiel", src: "beelden/hiel.png" },
+            { id: "keel", lw: "de", naam: "keel", src: "beelden/keel.png" }, { id: "kies", lw: "de", naam: "kies", src: "beelden/kies.png" },
+            { id: "knie", lw: "de", naam: "knie", src: "beelden/knie.png" }, { id: "kruin", lw: "de", naam: "kruin", src: "beelden/kruin.png" },
+            { id: "longen", lw: "de", naam: "longen", src: "beelden/longen.png" }, { id: "mond", lw: "de", naam: "mond", src: "beelden/mond.png" },
+            { id: "nagel", lw: "de", naam: "nagel", src: "beelden/nagel.png" }, { id: "navel", lw: "de", naam: "navel", src: "beelden/navel.png" },
+            { id: "neus", lw: "de", naam: "neus", src: "beelden/neus.png" }, { id: "nies", lw: "de", naam: "nies", src: "beelden/nies.png" },
+            { id: "oog", lw: "het", naam: "oog", src: "beelden/oog.png" }, { id: "pillen", lw: "de", naam: "pillen", src: "beelden/pillen.png" },
+            { id: "rug", lw: "de", naam: "rug", src: "beelden/rug.png" }, { id: "schouder", lw: "de", naam: "schouder", src: "beelden/schouder.png" },
+            { id: "schouder1", lw: "de", naam: "schouder", src: "beelden/schouder1.png" }, { id: "teen", lw: "de", naam: "teen", src: "beelden/teen.png" },
+            { id: "tong", lw: "de", naam: "tong", src: "beelden/tong.png" }
         ];
 
-        // Lokale spel-staat
-        let state = {
-            currentUser: "",
-            userId: "",
-            myRole: "", // 'helper' of 'speurneus'
-            currentGameId: "game_demo_01",
-            currentPart: null
-        };
+        let state = { p1: "", p2: "", current: null, startTime: 0, timer: null };
 
-        // --- UI ELEMENTEN ---
-        const UI = {
-            login: document.getElementById('login-section'),
-            waiting: document.getElementById('waiting-screen'),
-            game: document.getElementById('game-screen'),
-            helperView: document.getElementById('helper-view'),
-            typerView: document.getElementById('typer-view'),
-            roleInd: document.getElementById('role-indicator'),
-            image: document.getElementById('current-body-image'),
-            typerAnswer: document.getElementById('typer-answer-display'),
-            wordInput: document.getElementById('word-input'),
-            typerFeedback: document.getElementById('typer-feedback-message'),
-            leaderboard: document.getElementById('leaderboard-list')
-        };
+        // --- SPEL LOGICA ---
+        function startApp() {
+            state.p1 = document.getElementById('p1-name').value;
+            state.p2 = document.getElementById('p2-name').value;
+            if(!state.p1 || !state.p2) return alert("Namen invullen!");
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('display-p1').innerText = state.p1.toUpperCase();
+            document.getElementById('display-p2').innerText = state.p2.toUpperCase();
+            state.startTime = Date.now();
+            runTimer(); nextRound();
+        }
 
+        function runTimer() {
+            state.timer = setInterval(() => {
+                const s = Math.floor((Date.now() - state.startTime) / 1000);
+                document.getElementById('timer-display').innerText = `Tijd: ${s}s`;
+            }, 1000);
+        }
 
-        // --- FUNCTIES ---
+        function nextRound() {
+            state.current = bodyParts[Math.floor(Math.random() * bodyParts.length)];
+            document.getElementById('current-image').src = state.current.src;
+            document.getElementById('main-input').value = "";
+            document.getElementById('live-text-view').innerText = "...";
+            document.getElementById('correction-result').innerText = "";
+            document.getElementById('correction-result').className = "";
+        }
 
-        window.startMatchmaking = function() {
-            const name = document.getElementById('username').value.trim();
-            if(!name) return alert("Vul eerst je naam in!");
-            
-            state.currentUser = name;
-            state.userId = name.toLowerCase() + "_" + Math.floor(Math.random()*1000);
+        function syncInput() { document.getElementById('live-text-view').innerText = document.getElementById('main-input').value; }
 
-            UI.login.classList.add('hidden');
-            UI.waiting.classList.remove('hidden');
-
-            setTimeout(() => {
-                UI.waiting.classList.add('hidden');
-                UI.game.classList.remove('hidden');
-                
-                state.myRole = Math.random() > 0.5 ? 'helper' : 'speurneus';
-                
-                setupRound();
-            }, 1500); 
-        };
-
-        function setupRound() {
-            state.currentPart = bodyParts[Math.floor(Math.random() * bodyParts.length)];
-
-            if(state.myRole === 'helper') {
-                UI.roleInd.innerText = `Jij bent de Helper 🌟 (${state.currentUser})`;
-                UI.roleInd.className = "text-lg font-bold p-2 px-4 rounded-full bg-yellow-100 text-yellow-700";
-                UI.helperView.classList.remove('hidden');
-                UI.typerView.classList.add('hidden');
-                
-                UI.image.src = state.currentPart.pad;
-                UI.typerAnswer.innerText = "[wacht op antwoord...]";
-                UI.typerAnswer.className = "text-3xl font-mono font-bold text-gray-400 mb-4 tracking-wider";
-
+        function check(isOk) {
+            const typed = document.getElementById('main-input').value.toLowerCase().trim();
+            const resBox = document.getElementById('correction-result');
+            if(isOk && typed === state.current.naam) {
+                resBox.innerText = `✅ CORRECT: ${state.current.lw.toUpperCase()} ${state.current.naam.toUpperCase()}`;
+                resBox.className = "mt-4 p-4 rounded-xl font-bold text-center bg-emerald-100 text-emerald-700 animate-bounce";
+                setTimeout(() => { state.startTime = Date.now(); nextRound(); }, 2000);
             } else {
-                UI.roleInd.innerText = `Jij bent de Speurneus 🔍 (${state.currentUser})`;
-                UI.roleInd.className = "text-lg font-bold p-2 px-4 rounded-full bg-blue-100 text-blue-700";
-                UI.typerView.classList.remove('hidden');
-                UI.helperView.classList.add('hidden');
-                
-                UI.wordInput.value = "";
-                UI.typerFeedback.innerText = "";
-                UI.typerFeedback.className = "mt-6 text-2xl font-bold p-4 rounded-xl min-h-[60px]";
+                resBox.innerText = "❌ KIJK GOED OF TYP OPNIEUW";
+                resBox.className = "mt-4 p-4 rounded-xl font-bold text-center bg-rose-100 text-rose-700";
             }
         }
 
-        window.submitWord = function() {
-            const typedWord = UI.wordInput.value.toLowerCase().trim();
-            if(!typedWord) return;
+        // --- DOCENTEN LOGICA ---
+        function renderTeacherPanel() {
+            const grid = document.getElementById('teacher-grid');
+            grid.innerHTML = "";
+            document.getElementById('total-count').innerText = bodyParts.length;
 
-            alert("Woord verstuurd! Je maatje gaat het controleren.");
-            
-            UI.typerAnswer.innerText = typedWord;
-            UI.typerAnswer.className = "text-5xl font-mono font-bold text-blue-600 mb-4 tracking-wider bg-blue-50 p-2 rounded-lg";
-        };
+            bodyParts.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 rounded-2xl shadow-sm border flex items-center gap-4";
+                card.innerHTML = `
+                    <img src="${item.src}" class="img-preview-thumb" onerror="this.src='https://via.placeholder.com/60?text=Error'">
+                    <div class="flex-1">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">${item.id}</p>
+                        <div class="flex gap-1 mt-1">
+                            <input type="text" value="${item.lw}" onchange="updateData(${index}, 'lw', this.value)" class="w-10 p-1 border rounded text-xs text-center font-bold">
+                            <input type="text" value="${item.naam}" onchange="updateData(${index}, 'naam', this.value)" class="flex-1 p-1 border rounded text-xs font-bold">
+                            <button onclick="removeWord(${index})" class="text-rose-500 p-1">🗑️</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
 
-        window.sendFeedback = function(isCorrect) {
-            if(isCorrect) {
-                const typedWord = UI.typerAnswer.innerText;
-                
-                if(typedWord === state.currentPart.naam) {
-                    alert(`Super gedaan! Het woord was inderdaad ${state.currentPart.naam.toUpperCase()}. +1 Groeipunt voor jullie allebei! 🎉`);
-                    setupRound();
-                } else {
-                    alert(`Bijna! Je maatje dacht dat het goed was, maar het woord is: ${state.currentPart.naam.toUpperCase()}. Probeer het nog eens samen.`);
-                }
-            } else {
-                alert("Niet erg! Geef je maatje een tip (bijvoorbeeld: 'Het begint met de O').");
-            }
-        };
+        function addNewWord() {
+            const lw = document.getElementById('new-lw').value;
+            const name = document.getElementById('new-name').value.trim().toLowerCase();
+            const fileInput = document.getElementById('new-file');
 
-        const scores = [
-            {n: "Ahmed", p: 18}, {n: "Lina", p: 15}, {n: "Kyan", p: 12}, {n: "Mila", p: 9}, {n: "Corianne's Klas", p: "❤️"}
-        ];
-        scores.forEach((s, index) => {
-            const medal = index === 0 ? "🥇 " : (index === 1 ? "🥈 " : (index === 2 ? "🥉 " : (index === 4 ? "👩‍🏫 " : "⭐ ")));
-            UI.leaderboard.innerHTML += `
-                <div class="flex justify-between items-center border-b border-gray-100 py-3 px-2 ${index < 3 ? 'bg-green-50 rounded' : ''}">
-                    <span class="text-lg text-gray-800">${medal}${s.n}</span>
-                    <span class="font-bold text-green-600 bg-white px-3 py-1 rounded-full shadow-sm">${s.p} ptn</span>
-                </div>`;
-        });
+            if(!name || !fileInput.files[0]) return alert("Vul een naam in en kies een foto!");
 
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const newObj = {
+                    id: name + "_" + Date.now(),
+                    lw: lw,
+                    naam: name,
+                    src: e.target.result // Dit is een data-URL van de geüploade foto
+                };
+                bodyParts.push(newObj);
+                renderTeacherPanel();
+                alert("Foto toegevoegd aan de sessie!");
+                document.getElementById('new-name').value = "";
+                fileInput.value = "";
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+
+        window.updateData = (idx, field, val) => { bodyParts[idx][field] = val.toLowerCase().trim(); };
+        window.removeWord = (idx) => { if(confirm("Verwijderen?")) { bodyParts.splice(idx, 1); renderTeacherPanel(); } };
+
+        renderTeacherPanel();
     </script>
 </body>
 </html>
