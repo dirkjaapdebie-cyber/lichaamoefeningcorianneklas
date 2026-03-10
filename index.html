@@ -3,233 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anatomie Lab - Corianne</title>
+    <title>Anatomie Lab Firebase - Corianne</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Quicksand', sans-serif; background: #f0f7ff; }
-        .medical-card { background: white; border-radius: 2rem; border: 2px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .medical-card { background: white; border-radius: 2rem; border: 4px solid #e2e8f0; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
         .terminal { font-family: 'Space Mono', monospace; background: #0f172a; color: #4ade80; }
-        .admin-hidden { display: none; }
+        .hidden { display: none; }
     </style>
 </head>
 <body class="p-4">
 
     <div id="setup-screen" class="max-w-md mx-auto medical-card p-10 mt-10 text-center">
         <h1 class="text-3xl font-black text-blue-600 mb-6 uppercase">HET LAB 🩺</h1>
+        <p class="mb-6 text-slate-500 font-bold">Klas: Corianne</p>
         <div class="space-y-4">
-            <input type="text" id="p1-name" placeholder="Naam Vrager" class="w-full p-4 border rounded-2xl outline-none focus:ring-2 ring-blue-500">
-            <input type="text" id="p2-name" placeholder="Naam Typer" class="w-full p-4 border rounded-2xl outline-none focus:ring-2 ring-blue-500">
-            <button onclick="startApp()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold text-xl hover:bg-blue-700">START SPEL</button>
+            <input type="text" id="user-name" placeholder="Je Naam" class="w-full p-4 border rounded-2xl outline-none focus:ring-2 ring-blue-500">
+            <button onclick="joinLab()" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold text-xl hover:bg-blue-700 transition">INLOGGEN</button>
         </div>
-        <button onclick="loginAdmin()" class="mt-8 text-slate-300 text-xs hover:text-blue-400">Beheer voor docenten</button>
+        <div id="status-msg" class="mt-4 text-sm text-blue-400"></div>
     </div>
 
-    <div id="game-screen" class="hidden max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
-        <div class="medical-card p-8 border-t-[10px] border-amber-400">
-            <div class="flex justify-between mb-4 font-bold text-slate-400 uppercase text-xs"><span>Scan resultaat</span><span id="display-p1"></span></div>
-            <div class="bg-slate-50 h-64 mb-6 rounded-2xl flex items-center justify-center border-2 border-dashed overflow-hidden">
-                <img id="current-image" src="" class="max-h-full max-w-full object-contain">
-                <div id="img-error" class="hidden text-rose-500 font-bold text-center p-4">❌ Foto niet gevonden<br><span id="error-filename" class="text-xs font-mono text-slate-400"></span></div>
+    <div id="game-screen" class="hidden max-w-4xl mx-auto mt-6">
+        <div class="grid grid-cols-1 gap-6">
+            
+            <div id="role-header" class="text-center p-4 rounded-2xl text-white font-black uppercase tracking-widest shadow-lg">
+                LADEN...
             </div>
-            <div id="live-text-view" class="terminal p-6 rounded-2xl text-3xl text-center min-h-[80px] flex items-center justify-center uppercase">...</div>
-            <div id="correction-result" class="mt-4 p-4 rounded-xl font-bold text-center min-h-[60px]"></div>
-            <div class="flex justify-center gap-6 mt-6">
-                <button onclick="check(true)" class="bg-emerald-500 text-white w-20 h-20 rounded-full text-4xl shadow-lg hover:scale-105 active:scale-95 transition">👍</button>
-                <button onclick="check(false)" class="bg-rose-500 text-white w-20 h-20 rounded-full text-4xl shadow-lg hover:scale-105 active:scale-95 transition">👎</button>
-            </div>
-        </div>
 
-        <div class="medical-card p-8 border-t-[10px] border-blue-500 text-center">
-            <div class="flex justify-between mb-4 font-bold text-slate-400 uppercase text-xs"><span>Invoermodule</span><span id="display-p2"></span></div>
-            <input type="text" id="main-input" oninput="syncInput()" class="terminal w-full p-8 rounded-3xl text-4xl text-center outline-none border-4 border-slate-800 focus:border-blue-500" placeholder="TYPEN..." autocomplete="off">
-            <div id="timer-display" class="mt-12 text-center text-4xl font-mono text-blue-500 font-bold">0s</div>
-            <div id="leaderboard-list" class="mt-10 space-y-2"></div>
+            <div class="medical-card p-8 relative">
+                <div id="view-looker" class="hidden space-y-6">
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-400 uppercase">
+                        <span>Jij bent de Scanner</span>
+                        <span id="partner-name-display"></span>
+                    </div>
+                    <div class="bg-slate-50 h-80 rounded-3xl flex items-center justify-center border-4 border-dashed border-slate-200 overflow-hidden">
+                        <img id="current-image" src="" class="max-h-full max-w-full object-contain">
+                    </div>
+                    <p class="text-center text-xl font-bold text-blue-800 animate-pulse">VERTEL WAT JE ZIET!</p>
+                </div>
+
+                <div id="view-typer" class="hidden space-y-6">
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-400 uppercase">
+                        <span>Jij bent de Typer</span>
+                        <span>Typ wat je hoort</span>
+                    </div>
+                    <div class="terminal p-10 rounded-3xl">
+                        <input type="text" id="main-input" oninput="checkWord()" class="w-full bg-transparent text-5xl text-center outline-none uppercase font-bold" placeholder="..." autocomplete="off">
+                    </div>
+                    <p class="text-center text-slate-400 font-bold">Wacht op instructies van je partner</p>
+                </div>
+
+                <div id="feedback" class="mt-6 text-center text-2xl font-black uppercase min-h-[40px]"></div>
+            </div>
         </div>
     </div>
 
-    <section id="admin-panel" class="admin-hidden max-w-6xl mx-auto mt-20 p-10 bg-white rounded-[3rem] border-4 border-blue-100 shadow-2xl">
-        <div class="flex justify-between items-center mb-10">
-            <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">⚙️ Beheer: Onderdelen Toevoegen</h2>
-            <button onclick="logoutAdmin()" class="bg-slate-100 px-4 py-2 rounded-lg font-bold">Sluiten</button>
-        </div>
-        
-        <div class="mb-10 p-6 bg-blue-50 rounded-2xl grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-            <div>
-                <label class="block text-xs font-bold mb-1">Bestandsnaam (bv. neus.png)</label>
-                <input type="text" id="new-id" class="w-full p-2 border rounded-lg">
-            </div>
-            <div>
-                <label class="block text-xs font-bold mb-1">Lidwoord (de/het)</label>
-                <select id="new-lw" class="w-full p-2 border rounded-lg">
-                    <option value="de">de</option>
-                    <option value="het">het</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-xs font-bold mb-1">Naam lichaamsdeel</label>
-                <input type="text" id="new-naam" class="w-full p-2 border rounded-lg">
-            </div>
-            <button onclick="addItem()" class="bg-blue-600 text-white p-2 rounded-lg font-bold hover:bg-blue-700">Voeg Toe</button>
-        </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue, set, update, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        <div class="mb-8 grid grid-cols-2 md:grid-cols-5 gap-4" id="teacher-grid">
-            </div>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBC3Dzm8PNPXw12VJNimvly5u2I93QeW54",
+            authDomain: "schatgravers15maart2026.firebaseapp.com",
+            databaseURL: "https://schatgravers15maart2026-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "schatgravers15maart2026",
+            storageBucket: "schatgravers15maart2026.firebasestorage.app",
+            messagingSenderId: "30561512857",
+            appId: "1:30561512857:web:fcb7868b87d292d1c97708"
+        };
 
-        <div class="bg-rose-50 p-6 rounded-2xl flex justify-between items-center">
-            <p class="text-rose-600 font-bold text-sm uppercase">Gevaarlijke zone</p>
-            <button onclick="resetLeaderboard()" class="bg-rose-600 text-white px-6 py-2 rounded-xl font-bold">Leeg het Scorebord</button>
-        </div>
-    </section>
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const labRef = ref(db, 'labs/corianne');
 
-    <script>
-        // Standaard lijst als er niks in het geheugen staat
-        const defaultParts = [
-            { id: "kruin.png", lw: "de", naam: "kruin" },
-            { id: "voorhoofd.png", lw: "het", naam: "voorhoofd" },
-            { id: "wenkbrauw.png", lw: "de", naam: "wenkbrauw" },
-            { id: "oog.png", lw: "het", naam: "oog" },
-            { id: "neus.png", lw: "de", naam: "neus" },
-            { id: "mond.png", lw: "de", naam: "mond" },
-            { id: "keel.png", lw: "de", naam: "keel" },
-            { id: "hals.png", lw: "de", naam: "hals" },
-            { id: "schouder.png", lw: "de", naam: "schouder" },
-            { id: "rug.png", lw: "de", naam: "rug" }
+        const bodyParts = [
+            { id: "kruin.png", naam: "kruin" },
+            { id: "voorhoofd.png", naam: "voorhoofd" },
+            { id: "wenkbrauw.png", naam: "wenkbrauw" },
+            { id: "oog.png", naam: "oog" },
+            { id: "neus.png", naam: "neus" },
+            { id: "mond.png", naam: "mond" },
+            { id: "keel.png", naam: "keel" }
         ];
 
-        // Laad uit LocalStorage of gebruik de standaard lijst
-        let bodyParts = JSON.parse(localStorage.getItem('anatomie_parts')) || defaultParts;
-        let state = { p1: "", p2: "", current: null, startTime: 0 };
+        let myId = null;
+        let myName = "";
+        let currentRole = "";
+        let currentItem = null;
 
-        function loginAdmin() {
-            const pass = prompt("Voer wachtwoord in:");
-            if (pass === "123") {
-                document.getElementById('admin-panel').classList.remove('admin-hidden');
-                renderTeacher();
-                window.scrollTo(0, document.body.scrollHeight);
-            } else {
-                alert("Fout wachtwoord!");
-            }
-        }
-
-        function logoutAdmin() {
-            document.getElementById('admin-panel').classList.add('admin-hidden');
-        }
-
-        // NIEUW: Item toevoegen
-        function addItem() {
-            const id = document.getElementById('new-id').value.trim();
-            const lw = document.getElementById('new-lw').value;
-            const naam = document.getElementById('new-naam').value.toLowerCase().trim();
-
-            if(!id || !naam) return alert("Vul alles in!");
-
-            bodyParts.push({ id, lw, naam });
-            saveAndRefresh();
+        window.joinLab = function() {
+            myName = document.getElementById('user-name').value;
+            if(!myName) return alert("Naam?");
             
-            // Maak velden leeg
-            document.getElementById('new-id').value = "";
-            document.getElementById('new-naam').value = "";
-        }
+            myId = push(ref(db, 'labs/corianne/players')).key;
+            set(ref(db, `labs/corianne/players/${myId}`), { name: myName, active: true });
+            
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('status-msg').innerText = "Verbonden...";
+            
+            listenToGame();
+        };
 
-        // NIEUW: Item verwijderen
-        function removeItem(index) {
-            if(confirm("Weet je zeker dat je dit onderdeel wilt verwijderen?")) {
-                bodyParts.splice(index, 1);
-                saveAndRefresh();
-            }
-        }
+        function listenToGame() {
+            onValue(labRef, (snapshot) => {
+                const data = snapshot.val();
+                if(!data) return;
 
-        function saveAndRefresh() {
-            localStorage.setItem('anatomie_parts', JSON.stringify(bodyParts));
-            renderTeacher();
-        }
-
-        function renderTeacher() {
-            const grid = document.getElementById('teacher-grid');
-            grid.innerHTML = "";
-            bodyParts.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.className = "bg-slate-50 p-2 rounded-xl border text-center relative group";
-                card.innerHTML = `
-                    <button onclick="removeItem(${index})" class="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-6 h-6 text-xs opacity-0 group-hover:opacity-100 transition">X</button>
-                    <img src="${item.id}" class="h-12 w-full object-contain mb-1 bg-white rounded">
-                    <span class="text-[10px] block font-bold">${item.lw} ${item.naam}</span>
-                    <span class="text-[8px] text-slate-400 font-mono">${item.id}</span>
-                `;
-                grid.appendChild(card);
+                const players = Object.keys(data.players || {});
+                
+                // Koppeling: Speler 1 is Kijker, Speler 2 is Typer (of andersom)
+                if(players.length >= 2) {
+                    const isEven = players.indexOf(myId) % 2 === 0;
+                    // De 'turn' bepaalt wie kijker is. Als turn 0 is, is Speler 1 de kijker.
+                    const turn = data.gameState?.turn || 0;
+                    const role = (isEven && turn % 2 === 0) || (!isEven && turn % 2 !== 0) ? 'looker' : 'typer';
+                    
+                    updateUI(role, data.gameState?.currentItem);
+                } else {
+                    document.getElementById('role-header').innerText = "WACHTEN OP PARTNER...";
+                    document.getElementById('role-header').className = "text-center p-4 rounded-2xl bg-slate-400 text-white font-black";
+                }
             });
         }
 
-        function startApp() {
-            state.p1 = document.getElementById('p1-name').value;
-            state.p2 = document.getElementById('p2-name').value;
-            if(!state.p1 || !state.p2) return alert("Namen invullen!");
-            if(bodyParts.length === 0) return alert("Voeg eerst lichaamsdelen toe in het beheerpaneel!");
-
-            document.getElementById('setup-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.remove('hidden');
-            document.getElementById('display-p1').innerText = state.p1;
-            document.getElementById('display-p2').innerText = state.p2;
-            state.startTime = Date.now();
+        function updateUI(role, item) {
+            currentRole = role;
+            currentItem = item;
             
-            setInterval(() => {
-                const s = Math.floor((Date.now() - state.startTime) / 1000);
-                document.getElementById('timer-display').innerText = s + "s";
-            }, 1000);
-            nextRound();
-        }
+            const header = document.getElementById('role-header');
+            const lookerView = document.getElementById('view-looker');
+            const typerView = document.getElementById('view-typer');
 
-        function nextRound() {
-            state.current = bodyParts[Math.floor(Math.random() * bodyParts.length)];
-            const img = document.getElementById('current-image');
-            const err = document.getElementById('img-error');
-            const errFile = document.getElementById('error-filename');
-            
-            img.classList.remove('hidden');
-            err.classList.add('hidden');
-            
-            img.onerror = () => {
-                img.classList.add('hidden');
-                err.classList.remove('hidden');
-                errFile.innerText = "Gezocht naar: " + state.current.id;
-            };
-            
-            img.src = state.current.id + "?t=" + new Date().getTime();
-            document.getElementById('main-input').value = "";
-            document.getElementById('live-text-view').innerText = "...";
-            document.getElementById('correction-result').innerText = "";
-            document.getElementById('correction-result').className = "";
-        }
-
-        function syncInput() { document.getElementById('live-text-view').innerText = document.getElementById('main-input').value; }
-
-        function check(isOk) {
-            const typed = document.getElementById('main-input').value.toLowerCase().trim();
-            const resBox = document.getElementById('correction-result');
-            if(isOk && typed === state.current.naam) {
-                const s = Math.floor((Date.now() - state.startTime) / 1000);
-                resBox.innerText = `✅ GOED: ${state.current.lw.toUpperCase()} ${state.current.naam.toUpperCase()}`;
-                resBox.className = "mt-4 p-4 rounded-xl font-bold text-center bg-emerald-100 text-emerald-700 animate-bounce";
-                addLeaderboard(s);
-                setTimeout(() => { state.startTime = Date.now(); nextRound(); }, 2000);
+            if(role === 'looker') {
+                header.innerText = "Jij ziet de scan 🔍";
+                header.className = "text-center p-4 rounded-2xl bg-amber-500 text-white font-black shadow-lg";
+                lookerView.classList.remove('hidden');
+                typerView.classList.add('hidden');
+                if(item) document.getElementById('current-image').src = item.id;
             } else {
-                resBox.innerText = "❌ KIJK GOED OF PROBEER OPNIEUW";
-                resBox.className = "mt-4 p-4 rounded-xl font-bold text-center bg-rose-100 text-rose-700";
+                header.innerText = "Jij moet typen ⌨️";
+                header.className = "text-center p-4 rounded-2xl bg-blue-600 text-white font-black shadow-lg";
+                lookerView.classList.add('hidden');
+                typerView.classList.remove('hidden');
+                document.getElementById('main-input').focus();
+            }
+            
+            // Als er nog geen item is en ik ben de kijker, kies er een
+            if(!item && role === 'looker') {
+                pickNewItem();
             }
         }
 
-        function addLeaderboard(t) {
-            const list = document.getElementById('leaderboard-list');
-            const row = document.createElement('div');
-            row.className = "flex justify-between bg-white p-3 rounded-xl border-2 border-slate-100";
-            row.innerHTML = `<span class="font-bold text-slate-700">${state.p1} & ${state.p2}</span><span class="bg-blue-600 text-white px-3 py-1 rounded-lg font-mono font-bold">${t}s</span>`;
-            list.prepend(row);
+        function pickNewItem() {
+            const newItem = bodyParts[Math.floor(Math.random() * bodyParts.length)];
+            update(ref(db, 'labs/corianne/gameState'), {
+                currentItem: newItem,
+                feedback: ""
+            });
         }
 
-        function resetLeaderboard() {
-            document.getElementById('leaderboard-list').innerHTML = "";
-        }
+        window.checkWord = function() {
+            if(currentRole !== 'typer') return;
+            const input = document.getElementById('main-input').value.toLowerCase().trim();
+            
+            if(input === currentItem.naam) {
+                // Correct! Update de database voor BEIDE spelers
+                const currentTurn = (currentItem.turn || 0);
+                update(ref(db, 'labs/corianne/gameState'), {
+                    feedback: "✅ GOED ZO!",
+                    lastWord: currentItem.naam
+                });
+
+                // Wacht even en wissel dan de rollen (turn + 1)
+                setTimeout(() => {
+                    onValue(ref(db, 'labs/corianne/gameState/turn'), (snap) => {
+                        const nextTurn = (snap.val() || 0) + 1;
+                        update(ref(db, 'labs/corianne/gameState'), {
+                            turn: nextTurn,
+                            currentItem: bodyParts[Math.floor(Math.random() * bodyParts.length)],
+                            feedback: ""
+                        });
+                    }, { onlyOnce: true });
+                    document.getElementById('main-input').value = "";
+                }, 2000);
+            }
+        };
+
+        // Luister naar feedback (voor de animatie)
+        onValue(ref(db, 'labs/corianne/gameState/feedback'), (snap) => {
+            const fbDiv = document.getElementById('feedback');
+            fbDiv.innerText = snap.val() || "";
+            fbDiv.className = snap.val() ? "mt-6 text-center text-2xl font-black uppercase text-emerald-500 animate-bounce" : "";
+        });
+
     </script>
 </body>
 </html>
