@@ -50,10 +50,29 @@
 
     <section id="admin-panel" class="admin-hidden max-w-6xl mx-auto mt-20 p-10 bg-white rounded-[3rem] border-4 border-blue-100 shadow-2xl">
         <div class="flex justify-between items-center mb-10">
-            <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">⚙️ Beheerdersoverzicht</h2>
+            <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">⚙️ Beheer: Onderdelen Toevoegen</h2>
             <button onclick="logoutAdmin()" class="bg-slate-100 px-4 py-2 rounded-lg font-bold">Sluiten</button>
         </div>
         
+        <div class="mb-10 p-6 bg-blue-50 rounded-2xl grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div>
+                <label class="block text-xs font-bold mb-1">Bestandsnaam (bv. neus.png)</label>
+                <input type="text" id="new-id" class="w-full p-2 border rounded-lg">
+            </div>
+            <div>
+                <label class="block text-xs font-bold mb-1">Lidwoord (de/het)</label>
+                <select id="new-lw" class="w-full p-2 border rounded-lg">
+                    <option value="de">de</option>
+                    <option value="het">het</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold mb-1">Naam lichaamsdeel</label>
+                <input type="text" id="new-naam" class="w-full p-2 border rounded-lg">
+            </div>
+            <button onclick="addItem()" class="bg-blue-600 text-white p-2 rounded-lg font-bold hover:bg-blue-700">Voeg Toe</button>
+        </div>
+
         <div class="mb-8 grid grid-cols-2 md:grid-cols-5 gap-4" id="teacher-grid">
             </div>
 
@@ -64,7 +83,8 @@
     </section>
 
     <script>
-        const bodyParts = [
+        // Standaard lijst als er niks in het geheugen staat
+        const defaultParts = [
             { id: "kruin.png", lw: "de", naam: "kruin" },
             { id: "voorhoofd.png", lw: "het", naam: "voorhoofd" },
             { id: "wenkbrauw.png", lw: "de", naam: "wenkbrauw" },
@@ -77,6 +97,8 @@
             { id: "rug.png", lw: "de", naam: "rug" }
         ];
 
+        // Laad uit LocalStorage of gebruik de standaard lijst
+        let bodyParts = JSON.parse(localStorage.getItem('anatomie_parts')) || defaultParts;
         let state = { p1: "", p2: "", current: null, startTime: 0 };
 
         function loginAdmin() {
@@ -94,15 +116,63 @@
             document.getElementById('admin-panel').classList.add('admin-hidden');
         }
 
+        // NIEUW: Item toevoegen
+        function addItem() {
+            const id = document.getElementById('new-id').value.trim();
+            const lw = document.getElementById('new-lw').value;
+            const naam = document.getElementById('new-naam').value.toLowerCase().trim();
+
+            if(!id || !naam) return alert("Vul alles in!");
+
+            bodyParts.push({ id, lw, naam });
+            saveAndRefresh();
+            
+            // Maak velden leeg
+            document.getElementById('new-id').value = "";
+            document.getElementById('new-naam').value = "";
+        }
+
+        // NIEUW: Item verwijderen
+        function removeItem(index) {
+            if(confirm("Weet je zeker dat je dit onderdeel wilt verwijderen?")) {
+                bodyParts.splice(index, 1);
+                saveAndRefresh();
+            }
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('anatomie_parts', JSON.stringify(bodyParts));
+            renderTeacher();
+        }
+
+        function renderTeacher() {
+            const grid = document.getElementById('teacher-grid');
+            grid.innerHTML = "";
+            bodyParts.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-50 p-2 rounded-xl border text-center relative group";
+                card.innerHTML = `
+                    <button onclick="removeItem(${index})" class="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-6 h-6 text-xs opacity-0 group-hover:opacity-100 transition">X</button>
+                    <img src="${item.id}" class="h-12 w-full object-contain mb-1 bg-white rounded">
+                    <span class="text-[10px] block font-bold">${item.lw} ${item.naam}</span>
+                    <span class="text-[8px] text-slate-400 font-mono">${item.id}</span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
         function startApp() {
             state.p1 = document.getElementById('p1-name').value;
             state.p2 = document.getElementById('p2-name').value;
             if(!state.p1 || !state.p2) return alert("Namen invullen!");
+            if(bodyParts.length === 0) return alert("Voeg eerst lichaamsdelen toe in het beheerpaneel!");
+
             document.getElementById('setup-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
             document.getElementById('display-p1').innerText = state.p1;
             document.getElementById('display-p2').innerText = state.p2;
             state.startTime = Date.now();
+            
             setInterval(() => {
                 const s = Math.floor((Date.now() - state.startTime) / 1000);
                 document.getElementById('timer-display').innerText = s + "s";
@@ -125,7 +195,7 @@
                 errFile.innerText = "Gezocht naar: " + state.current.id;
             };
             
-            img.src = state.current.id + "?t=" + new Date().getTime(); // Anti-cache
+            img.src = state.current.id + "?t=" + new Date().getTime();
             document.getElementById('main-input').value = "";
             document.getElementById('live-text-view').innerText = "...";
             document.getElementById('correction-result').innerText = "";
@@ -159,17 +229,6 @@
 
         function resetLeaderboard() {
             document.getElementById('leaderboard-list').innerHTML = "";
-        }
-
-        function renderTeacher() {
-            const grid = document.getElementById('teacher-grid');
-            grid.innerHTML = "";
-            bodyParts.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "bg-slate-50 p-2 rounded-xl border text-center text-[10px]";
-                card.innerHTML = `<img src="${item.id}" class="h-12 w-full object-contain mb-1 bg-white rounded"><span>${item.id}</span>`;
-                grid.appendChild(card);
-            });
         }
     </script>
 </body>
